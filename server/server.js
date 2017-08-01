@@ -9,12 +9,22 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const pablicPath = path.join(__dirname, '../public');
+const publicPath = path.join(__dirname, '../public');
 
-app.use(express.static(pablicPath));
+app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
   console.log('New user connected');
+
+  socket.emit('newMessage', {
+    from: 'Server',
+    text: 'Hello client',
+    createAt: new Date().getTime()
+  });
+
+  socket.on('createMessage', (message) => {
+    console.log('createMessage', message);
+  });
 
   socket.on('disconnect', (socet) => {
     console.log('User was disconnected');
