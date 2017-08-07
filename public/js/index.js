@@ -8,24 +8,29 @@ socket.on('disconnect', function () {
   console.log('Disconnected from server');
 });
 
-socket.on('newMessage', function (message) {
-  // console.log('newMessage', message);
+socket.on('newMessage', function(message) {
   var formatedTime = moment(message.createdAt).format('DD MMM YYYY - k:mm');
-  var li = $('<li></li>');
-  li.text(`${message.from}: (${formatedTime}): ${message.text}`);
+  var template = $('#message-template').html();
+  var html = Mustache.render(template, {
+    text: message.text,
+    from: message.from,
+    createdAt: formatedTime
+  });
 
-  $('#messages').append(li);
+  $('#messages').append(html);
 });
 
 socket.on('newLocationMessage', function (message) {
-  var li = $('<li></li>');
-  var a = $('<a target="_blank">My current location</a>');
   var formatedTime = moment(message.createdAt).format('DD MMM YYYY - k:mm');
+  var template = $('#location-message-template').html();
+  var html = Mustache.render(template, {
+    from: message.from,
+    url: message.url,
+    createdAt: formatedTime
+  });
 
-  li.text(`${message.from} (${formatedTime}): `);
-  a.attr('href', message.url);
-  li.append(a);
-  $('#messages').append(li);
+  $('#messages').append(html);
+
 });
 
 $('#message-form').on('submit', function (e) {
@@ -46,15 +51,15 @@ $('#message-form').on('submit', function (e) {
 var locationButton = $('#send-location');
 
 locationButton.on('click', function() {
-
   var googleGeoApi = 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDRi9xZ7uZqeyvcJCOPKdDVwdhl3st365g';
 
-  $.post(googleGeoApi, function (data) {
-      socket.emit('createLocationMessage',
-        {
-          latitude: data.location.lat,
-          longitude: data.location.lng
-        });
+  $.post(googleGeoApi, function(data) {
+    socket.emit('createLocationMessage',
+      {
+        latitude: data.location.lat,
+        longitude: data.location.lng
+      });
 
+      console.log(data.location.lat, data.location.lng);
   });
 });
