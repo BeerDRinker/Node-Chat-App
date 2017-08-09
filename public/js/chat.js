@@ -73,10 +73,9 @@ $('#message-form').on('submit', function(e) {
 
   var messageTextbox = $('[name=message]');
 
-  socket.emit("createMessage", {
-    from: 'User',
+  socket.emit('createMessage', {
     text: messageTextbox.val()
-  }, function () {
+  }, function() {
     messageTextbox.val('');
   });
 });
@@ -95,6 +94,6 @@ locationButton.on('click', function() {
         longitude: data.location.lng
       });
 
-    // console.log(data.location.lat, data.location.lng);
+    //console.log(data.location.lat, data.location.lng);
   });
 });
